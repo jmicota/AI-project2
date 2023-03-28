@@ -1,5 +1,6 @@
 from data import extract_data, build_search_graph_dictionaries
 import dfs, bfs
+import time
 # PYDEVD_CONTAINER_RANDOM_ACCESS_MAX_ITEMS = 1400
 
 AGENCY_FILE = 'agency.txt'
@@ -26,7 +27,7 @@ print('---> Success')
 print(f'Stops: {len(stop_neighbours.keys())}; Trips: {len(trips)}, Lines: {len(route_lines)}')
 
 
-stop_str_names = [stop_names[key] for key in stop_names.keys()]
+stop_str_names = list(set([stop_names[key] for key in stop_names.keys()]))
 if 'Hlidar' in stop_str_names:
     print('Hlidar!')
 if 'Skeifan' in stop_str_names:
@@ -35,51 +36,71 @@ if 'Skeifan' in stop_str_names:
 
 while True:
     print()
-    print('Select test:')
-    print('(0) Check if stop exists in database')
-    print('(1) Check reachability of all stop pairs with DFS')
-    print('(2) Check reachability between two stops with DFS')
-    print('(3) Calculate shortest distance between two stops with BFS')
+    print('Example stop names: Hlidar, Skeifan, Sunnuhlid, Kopavogsskoli, Smaralind')
+    print('SELECT TEST:')
+    print('(1) DFS: Stop reachability')
+    print('(2) BFS: Shortest distance')
+    print('(3) BFS: Shortest path')
+    print('(4) BFS: Shortest path and valid stop times')
+    print('(5) BFS: Shortest path and optimal stop times')
     choice = input('---> ')
     # validate choice
     if not choice.isdigit():
         print('Selected value does not represent valid choice')
         continue
 
-    if int(choice) == 0:
-        stop_name = input('Input stop name: ')
-        if stop_name in stop_str_names:
-            print('Stop exists')
-        else:
-            print('Stop not found')
-
-    elif int(choice) == 1:
-        all_stop_ids = [key for key in stop_names.keys()]
-        dfs.check_all(all_stop_ids, stop_neighbours, stop_names)
-
-    elif int(choice) == 2:
-        print('Example stops existing: Hlidar, Skeifan, Sunnuhlid, Kopavogsskoli, Smaralind')
+    # DFS for one stop pair
+    if int(choice) == 1:
         stop1 = input('Stop 1: ')
         stop2 = input('Stop 2: ')
-        result = dfs.dfs(stop_neighbours, stop_ids[stop1], stop_ids[stop2], [])
+        result = dfs.dfs(stop_neighbours, stop1, stop2, [])
         if result == None:
             print('Stops unreachable')
         else:
             print('Stops reachable, list of visited stop IDs during execution of DFS:')
         print(result)
 
-    elif int(choice) == 3:
-        print('Example stops existing: Hlidar, Skeifan, Sunnuhlid, Kopavogsskoli, Smaralind')
+    # BFS for one stop pair
+    elif int(choice) == 2:
         stop1 = input('Stop 1: ')
         stop2 = input('Stop 2: ')
-        result = bfs.bfs(stop_neighbours, stop_ids[stop1], stop_ids[stop2])
+        result = bfs.bfs(stop_neighbours, stop1, stop2)
         if result == -1:
             print('Stops unreachable')
         else:
             print(f'Shortest distance in nr of stops: {result}')
 
+    # BFS for one stop pair with stop list
+    elif int(choice) == 3:
+        stop1 = input('Stop 1: ')
+        stop2 = input('Stop 2: ')
+        result = bfs.bfs_with_path(stop_neighbours, stop1, stop2)
+        if result == None:
+            print('Stops unreachable')
+        else:
+            for stop in result:
+                print(stop)
 
-# dfs_result = dfs.dfs(stop_neighbours, stop_ids['Hlidar'], stop_ids['Skeifan'], [])
+    # BFS for one stop pair with stop list and time
+    elif int(choice) == 4:
+        stop1 = input('Stop 1: ')
+        stop2 = input('Stop 2: ')
+        start_time = input('Input start time in format \'%H:%M:%S\': ')
+        result = bfs.bfs_with_path_and_time(stop_neighbours, stop1, stop2, start_time)
+        if result == None:
+            print('Stops unreachable')
+        else:
+            for stop in result:
+                print(stop)
 
-
-# print('yo')
+    # BFS for one stop pair with stop list and time
+    elif int(choice) == 5:
+        stop1 = input('Stop 1: ')
+        stop2 = input('Stop 2: ')
+        start_time = input('Input start time in format \'%H:%M:%S\': ')
+        result = bfs.bfs_with_path_and_correct_time(stop_neighbours, stop1, stop2, start_time)
+        if result == None:
+            print('Stops unreachable')
+        else:
+            for stop in result:
+                print(stop)

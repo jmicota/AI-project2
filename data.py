@@ -39,7 +39,7 @@ def build_search_graph_dictionaries(routes_data, stop_times_data, stops_data, tr
 
     # extract stop names
     for stop in stops_data:
-        stop_neighbours[stop['stop_id']] = []
+        stop_neighbours[stop['stop_name']] = []
         stop_names[stop['stop_id']] = stop['stop_name']
         stop_ids[stop['stop_name']] = stop['stop_id']
 
@@ -76,19 +76,20 @@ def build_search_graph_dictionaries(routes_data, stop_times_data, stops_data, tr
         trips[key]['direction'] = trip_stops[len(trip_stops) - 1]['stop_name']
 
     # extract neighbour stops for graph
-    for i in range(len(stop_times_data)):
-        # if there exists next stop for this trip
-        this_stop = stop_times_data[i]
-        this_stop_sequence = this_stop['stop_sequence']
-        if i < len(stop_times_data) - 1 and int(stop_times_data[i + 1]['stop_sequence']) == int(this_stop_sequence) + 1:
-            next_stop = stop_times_data[i + 1]
-            neighbour_entry = {}
-            neighbour_entry['stop_id'] = next_stop['stop_id']
-            neighbour_entry['departure_time'] = this_stop['departure_time']
-            neighbour_entry['arrival_time'] = next_stop['arrival_time']
-            neighbour_entry['line'] = trips[this_stop['trip_id']]['line']
-            neighbour_entry['direction'] = trips[this_stop['trip_id']]['direction']
-            stop_neighbours[this_stop['stop_id']].append(neighbour_entry)
+    for key in trips.keys():
+        trip = trips[key]
+        trip_stops = trip['stops']
+        for i in range(len(trip_stops)):
+            if i < len(trip_stops) - 1:
+                next_stop = trip_stops[i + 1]
+                neighbour_entry = {}
+                neighbour_entry['stop_name'] = next_stop['stop_name']
+                neighbour_entry['departure_time'] = next_stop['departure_time']
+                # neighbour_entry['arrival_time'] = next_stop['arrival_time']
+                neighbour_entry['line'] = trip['line']
+                neighbour_entry['direction'] = trip['direction']
+                stop_neighbours[trip_stops[i]['stop_name']].append(neighbour_entry)
+
 
     # delete Hamraborg from stop list, since it doesnt appear in any trip
     del stop_names['10000802']
