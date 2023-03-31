@@ -26,12 +26,13 @@ route_lines, stop_names, stop_ids, stop_neighbours, trips = \
 print('---> Success')
 print(f'Stops: {len(stop_neighbours.keys())}; Trips: {len(trips)}, Lines: {len(route_lines)}')
 
-
-stop_str_names = list(set([stop_names[key] for key in stop_names.keys()]))
-if 'Hlidar' in stop_str_names:
-    print('Hlidar!')
-if 'Skeifan' in stop_str_names:
-    print('Skeifan!')
+print()
+print('NR OF VERTICES:', len(stop_neighbours.keys()))
+vertices = 0
+for key in stop_neighbours.keys():
+    vertices += len(stop_neighbours[key])
+print('NR OF EDGES:', vertices)
+print()
 
 
 while True:
@@ -46,6 +47,7 @@ while True:
     choice = input('---> ')
     # validate choice
     if not choice.isdigit():
+        print()
         print('Selected value does not represent valid choice')
         continue
 
@@ -54,30 +56,33 @@ while True:
         stop1 = input('Stop 1: ')
         stop2 = input('Stop 2: ')
         result = dfs.dfs(stop_neighbours, stop1, stop2, [])
+        print()
         if result == None:
             print('Stops unreachable')
         else:
-            print('Stops reachable, list of visited stop IDs during execution of DFS:')
-        print(result)
+            print(f'Stops reachable (searched {len(result)} nodes)')
 
     # BFS for one stop pair
     elif int(choice) == 2:
         stop1 = input('Stop 1: ')
         stop2 = input('Stop 2: ')
-        result = bfs.bfs(stop_neighbours, stop1, stop2)
+        result, searched_nodes = bfs.bfs(stop_neighbours, stop1, stop2)
+        print()
         if result == -1:
             print('Stops unreachable')
         else:
-            print(f'Shortest distance in nr of stops: {result}')
+            print(f'Shortest distance in nr of stops: {result} (searched {searched_nodes} nodes)')
 
     # BFS for one stop pair with stop list
     elif int(choice) == 3:
         stop1 = input('Stop 1: ')
         stop2 = input('Stop 2: ')
-        result = bfs.bfs_with_path(stop_neighbours, stop1, stop2)
+        result, searched_nodes = bfs.bfs_with_path(stop_neighbours, stop1, stop2)
+        print()
         if result == None:
             print('Stops unreachable')
         else:
+            print(f'Searched {searched_nodes} nodes')
             for stop in result:
                 print(stop)
 
@@ -86,10 +91,12 @@ while True:
         stop1 = input('Stop 1: ')
         stop2 = input('Stop 2: ')
         start_time = input('Input start time in format \'%H:%M:%S\': ')
-        result = bfs.bfs_with_path_and_time(stop_neighbours, stop1, stop2, start_time)
+        result, searched_nodes = bfs.bfs_with_path_and_time(stop_neighbours, stop1, stop2, start_time)
+        print()
         if result == None:
             print('Stops unreachable')
         else:
+            print(f'Searched {searched_nodes} nodes')
             for stop in result:
                 print(stop)
 
@@ -98,9 +105,11 @@ while True:
         stop1 = input('Stop 1: ')
         stop2 = input('Stop 2: ')
         start_time = input('Input start time in format \'%H:%M:%S\': ')
-        result = bfs.bfs_with_path_and_correct_time(stop_neighbours, stop1, stop2, start_time)
+        result, searched_nodes = bfs.bfs_with_path_and_correct_time(stop_neighbours, stop1, stop2, start_time)
+        print()
         if result == None:
             print('Stops unreachable')
         else:
+            print(f'Searched {searched_nodes} nodes')
             for stop in result:
                 print(stop)
